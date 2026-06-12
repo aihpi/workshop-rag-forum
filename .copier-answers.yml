@@ -1,0 +1,10 @@
+# Changes here will be overwritten by Copier. Do not edit manually.
+_commit: d2b9a75
+_src_path: gh:aihpi/template-ai-project
+package_author_email: hanno.mueller@hpi.de
+package_author_name: hanno-mueller-HPI
+package_description: A forum for monthly meetings centred around Retrieval-Augmented
+    Generation (RAG).
+package_github_org: aihpi
+package_module: workshop_rag_forum
+package_name: workshop-rag-forum
