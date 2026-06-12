@@ -27,8 +27,9 @@ OUT_DIR = REPO_ROOT / "data" / "embeddings"
 load_dotenv(REPO_ROOT / ".env")
 
 MODEL = os.environ.get("OPENAI_EMBEDDING_MODEL", "minilm-embedding")
-CHUNK_WORDS = int(os.environ.get("CHUNK_WORDS", 350))  # ~512 tokens
-EMBED_BATCH = int(os.environ.get("EMBED_BATCH", 64))
+CHUNK_WORDS = int(os.environ.get("CHUNK_WORDS", 90))  # minilm caps input at 256 tokens
+MAX_CHARS = int(os.environ.get("MAX_CHARS", 450))  # hard guard; embed_batch shrinks further on a 413
+EMBED_BATCH = int(os.environ.get("EMBED_BATCH", 32))  # server caps batch at 32
 MAX_CHUNKS = int(os.environ["MAX_CHUNKS"]) if os.environ.get("MAX_CHUNKS") else None
 
 
@@ -41,13 +42,25 @@ def client() -> OpenAI:
 
 def chunk_text(text: str, n_words: int) -> list[str]:
     words = text.split()
-    return [" ".join(words[i:i + n_words]) for i in range(0, len(words), n_words)
-            if words[i:i + n_words]]
+    chunks = [" ".join(words[i:i + n_words]) for i in range(0, len(words), n_words)
+              if words[i:i + n_words]]
+    return [c[:MAX_CHARS] for c in chunks]  # truncate to stay under the model's token cap
 
 
 def embed_batch(cli: OpenAI, texts: list[str]) -> np.ndarray:
-    resp = cli.embeddings.create(model=MODEL, input=texts)
-    return np.array([d.embedding for d in resp.data], dtype=np.float32)
+    # The token cap is per-input; a char cap is only a heuristic, so on a 413
+    # ("must have less than N tokens") shrink every input and retry. Self-healing
+    # so one dense chunk can't abort a long run.
+    cap = MAX_CHARS
+    for _ in range(8):
+        try:
+            resp = cli.embeddings.create(model=MODEL, input=[t[:cap] for t in texts])
+            return np.array([d.embedding for d in resp.data], dtype=np.float32)
+        except Exception as e:  # noqa: BLE001 - retry only on the token-limit 413
+            if "256 tokens" not in str(e) and " tokens" not in str(e):
+                raise
+            cap = int(cap * 0.8)
+    raise RuntimeError(f"could not fit batch under token cap (final char cap {cap})")
 
 
 def main() -> None:
