@@ -2158,6 +2158,7 @@ source = { editable = "." }
 dependencies = [
     { name = "datasets" },
     { name = "defusedxml" },
+    { name = "httpx" },
     { name = "huggingface-hub" },
     { name = "matplotlib" },
     { name = "numpy" },
@@ -2185,6 +2186,7 @@ dev = [
 requires-dist = [
     { name = "datasets", specifier = ">=5.0.0" },
     { name = "defusedxml", specifier = ">=0.7.1" },
+    { name = "httpx", specifier = ">=0.28.1" },
     { name = "huggingface-hub", specifier = ">=1.19.0" },
     { name = "matplotlib", specifier = ">=3.11.0" },
     { name = "numpy", specifier = ">=2.4.6" },

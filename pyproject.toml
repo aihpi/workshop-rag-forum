@@ -40,6 +40,7 @@ classifiers = [
 dependencies = [
     "datasets>=5.0.0",
     "defusedxml>=0.7.1",
+    "httpx>=0.28.1",
     "huggingface-hub>=1.19.0",
     "matplotlib>=3.11.0",
     "numpy>=2.4.6",
@@ -66,7 +67,9 @@ dev = [
     "funlog>=0.2.1",
 ]
 
-# [project.scripts] is added with the CLI.
+[project.scripts]
+workshop-rag = "workshop_rag_forum.cli:main"
+workshop-rag-forum = "workshop_rag_forum.cli:main"
 
 
 # ---- Build system ----
