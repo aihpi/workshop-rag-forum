@@ -66,9 +66,7 @@ dev = [
     "funlog>=0.2.1",
 ]
 
-[project.scripts]
-# Add script entry points here:
-workshop-rag-forum = "workshop_rag_forum:main"
+# [project.scripts] is added with the CLI.
 
 
 # ---- Build system ----
@@ -164,8 +162,11 @@ reportUnreachable = false
 # reportPrivateLocalImportUsage = false
 # reportMissingImports = false
 # reportUnnecessaryIsInstance = false
-# reportUnknownVariableType = false
-# reportUnknownArgumentType = false
+# These three fire only on values flowing out of numpy/pandas/pytest, which ship
+# partial stubs; our own annotations are checked by the rules left enabled.
+reportUnknownMemberType = false
+reportUnknownVariableType = false
+reportUnknownArgumentType = false
 
 [tool.codespell]
 # Add here as needed:
