@@ -42,16 +42,17 @@ compare stages against each other:
 | Stage | Implementations |
 |-------|-----------------|
 | Embedding | `OpenAIEmbedder` (any OpenAI-compatible endpoint, incl. a LiteLLM proxy), `HashEmbedder` (deterministic, offline) |
-| Store | `VectorStore` — text, labels and vectors persisted **together**, exact cosine search |
-| Retrieval | `DenseRetriever`, `MMRRetriever` (relevance diversification), `TurboVecRetriever` (quantised, reusing the 260615 index) |
+| Store | `VectorStore`, with text, labels and vectors persisted **together**, exact cosine search |
+| Retrieval | `DenseRetriever`, `MMRRetriever` (relevance diversification), `DetGreedyRetriever` (fairness-aware reranking), `TurboVecRetriever` (quantised, reusing the 260615 index) |
 | Generation | `OpenAIGenerator` (citation-grounded prompting), `EchoGenerator` (offline stub) |
 
 ## Measuring retrieval bias
 
-The 260901 meeting measures **A = p_k / p₀** — a group's share of the top-k
-divided by its base rate in the relevant set — on German Wikipedia biographies
+The 260901 meeting measures **A = p_k / p₀**, a group's share of the top-k
+divided by its base rate in the relevant set, on German Wikipedia biographies
 labelled from Wikidata. A ratio rather than a share gap, so it is scale-free in
-the base rate.
+the base rate. The same run also reports nDCG, A inside article-length terciles,
+and what fairness-aware reranking costs in ranking quality.
 
 ```bash
 cp .env_example .env      # OPENAI_API_BASE / _API_KEY / _EMBEDDING_MODEL
@@ -62,7 +63,7 @@ uv run workshop-rag study --variant R --ks 10,100
 uv run workshop-rag show --variant R
 ```
 
-Add `--offline` to exercise the pipeline with hash embeddings and no endpoint —
+Add `--offline` to exercise the pipeline with hash embeddings and no endpoint:
 useful for checking the plumbing, never for a reported number.
 
 ## Meetings
@@ -71,6 +72,13 @@ useful for checking the plumbing, never for a reported number.
 |----------|-----------|---------------------------------|------------------------------------------------------|
 | 26-06-15 | turbovec  | `03_workshop/260615-turbovec/`  | Illustrating turbovec vector compression vs. a float32 embedding baseline |
 | 26-09-01 | rag-bias  | `03_workshop/260901-rag-bias/`  | Bias im RAG: measuring A = p_k/p₀ across occupations, with a realistic and a 50/50 corpus |
+
+## Documentation
+
+- [ARCHITECTURE.md](ARCHITECTURE.md): how the repository and the pipeline are
+  organised. Module map, the `attrs` contract, the Protocol seams, on-disk layout.
+- [03_workshop/260901-rag-bias/METHOD.md](03_workshop/260901-rag-bias/METHOD.md):
+  the bias study's method. Data sources, corpus variants, and the metric.
 
 ## Setup
 
