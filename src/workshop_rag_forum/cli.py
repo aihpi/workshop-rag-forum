@@ -24,7 +24,13 @@ from .config import ConfigError, Settings, get_settings
 from .embedding import Embedder, HashEmbedder, OpenAIEmbedder
 from .generation import EchoGenerator, Generator, OpenAIGenerator
 from .pipeline import RagPipeline
-from .retrieval import DenseRetriever, MMRRetriever, Retriever, TurboVecRetriever
+from .retrieval import (
+    DenseRetriever,
+    DetGreedyRetriever,
+    MMRRetriever,
+    Retriever,
+    TurboVecRetriever,
+)
 from .store import VectorStore
 from .types import Document
 
@@ -50,6 +56,13 @@ def _retriever(
         return DenseRetriever(store, embedder)
     if name == "mmr":
         return MMRRetriever(store, embedder, lambda_=mmr_lambda)
+    if name == "detgreedy":
+        # Targets are the corpus base rates over the whole store, which asks for
+        # A = 1 on average. The study's per-occupation curve is the finer tool;
+        # this exists so `query` can be run against the reranker interactively.
+        labels = [str(c.attrs["gender"]) for c in store.chunks if c.attrs.get("gender")]
+        targets = {g: labels.count(g) / len(labels) for g in set(labels)}
+        return DetGreedyRetriever(store, embedder, targets=targets)
     if name.startswith("turbovec"):
         bits = int(name.removeprefix("turbovec").lstrip("-") or 4)
         return TurboVecRetriever(store, embedder, bit_width=bits)
@@ -156,6 +169,8 @@ def cmd_study(args: argparse.Namespace) -> int:
         ks=[int(k) for k in args.ks.split(",")],
         variant=args.variant,
         seed=args.seed,
+        tradeoff=not args.no_tradeoff,
+        covariate=not args.no_covariate,
     )
     out = (
         Path(args.out)
@@ -212,7 +227,9 @@ def build_parser() -> argparse.ArgumentParser:
     query.add_argument("--store")
     query.add_argument("-k", type=int, default=10)
     query.add_argument(
-        "--retriever", default="dense", help="dense | mmr | turbovec-{2,3,4}"
+        "--retriever",
+        default="dense",
+        help="dense | mmr | detgreedy | turbovec-{2,3,4}",
     )
     query.add_argument("--mmr-lambda", type=float, default=0.5)
     query.add_argument("--no-generate", action="store_true")
@@ -229,7 +246,21 @@ def build_parser() -> argparse.ArgumentParser:
         "--ks", default="10,100", help="k values; the first is the headline"
     )
     study.add_argument("--seed", type=int, default=0)
-    study.add_argument("--retriever", default="dense")
+    study.add_argument(
+        "--retriever",
+        default="dense",
+        help="dense | mmr | detgreedy | turbovec-{2,3,4}",
+    )
+    study.add_argument(
+        "--no-tradeoff",
+        action="store_true",
+        help="skip the DetGreedy vs nDCG sweep",
+    )
+    study.add_argument(
+        "--no-covariate",
+        action="store_true",
+        help="skip the article-length tercile analysis",
+    )
     study.add_argument("--mmr-lambda", type=float, default=0.5)
     study.add_argument("--out")
     study.set_defaults(func=cmd_study)

@@ -172,8 +172,9 @@ reportUnknownVariableType = false
 reportUnknownArgumentType = false
 
 [tool.codespell]
-# Add here as needed:
-# ignore-words-list = "foo,bar"
+# This project quotes German throughout (query wordings, the meeting outline,
+# Wikipedia titles), so some German words collide with English corrections.
+ignore-words-list = "ist,alle,wenn,oder,vom,bei,womens"
 # skip = "foo.py,bar.py"
 
 [tool.pytest.ini_options]

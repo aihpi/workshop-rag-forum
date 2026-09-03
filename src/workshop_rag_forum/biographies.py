@@ -39,7 +39,6 @@ USER_AGENT = "workshop-rag-forum/0.1 (HPI AI Service Centre; RAG bias forum)"
 # too few to bootstrap but not a reason to drop the people from the study.
 GENDER_MALE = "Q6581097"
 GENDER_FEMALE = "Q6581072"
-GENDER_BUCKETS = {GENDER_FEMALE: "female", GENDER_MALE: "male"}
 GENDER_OTHER = "other"
 GROUPS = ["female", "male", GENDER_OTHER]
 
