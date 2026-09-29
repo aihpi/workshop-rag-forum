@@ -7,9 +7,9 @@ on:
   push:
     # Use ["main", "master"] for CI only on the default branch.
     # Use ["**"] for CI on all branches.
-    branches: ["main", "master"]
+    branches: ["main", "master", "dev"]
   pull_request:
-    branches: ["main", "master"]
+    branches: ["main", "master", "dev"]
 
 permissions:
   contents: read
