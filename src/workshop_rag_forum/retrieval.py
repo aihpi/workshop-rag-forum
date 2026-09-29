@@ -13,9 +13,10 @@ Three variants, because the bias questions are mostly comparisons between them:
 from __future__ import annotations
 
 import math
-from typing import Any, Protocol, override, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 import numpy as np
+from typing_extensions import override
 
 from .embedding import Embedder, l2_normalise
 from .store import VectorStore
