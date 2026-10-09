@@ -5,7 +5,7 @@
 - Level: component
 - ID: S1.1
 - Meta: ../../plan.md
-- Open for Hanno Müller before the talk: ob der Nextcloud-Ordner korrigiert ist (Sprechernotiz Folie 7; sonst den Halbsatz "und ich habe den Ordner korrigiert" weglassen); Zahlen (rund 140 Seiten, rund 8.000 Tokens) neu zählen
+- Open for Hanno Müller before the talk: ob der Nextcloud-Ordner korrigiert ist (Sprechernotiz Folie 7; sonst den Halbsatz "und ich habe den Ordner korrigiert" weglassen); Zahlen (rund 140 Seiten, rund 8.000 Tokens) neu zählen; Verweis auf die Wiki-Vorlage (Issue #2; Folie 12 und X6) fügt Hanno Müller selbst ein, sobald sie nach der Sicherheitsprüfung veröffentlicht ist (meta plan, Abschnitt 8). Achtung: `make_slides.py` überschreibt das Deck; den Verweis deshalb auch hier in Folie 12 und X6 eintragen oder nach dem letzten Lauf des Skripts von Hand einfügen.
 - Status log:
   - 2026-10-09 created from interface version 1
   - 2026-10-09 audience, S1.1, plan review: complete
@@ -18,6 +18,7 @@
   - 2026-10-09 audience, S1.1, material review: complete
   - 2026-10-09 presenter, S1.1, full plus light boundary check to S1.2: complete (estimate 20,5 of 20 min; change requests CR1 to CR4)
   - 2026-10-09 fixes F1 to F12 written into this plan, awaiting confirmation by Hanno Müller before the next creator run
+  - 2026-10-09 portraits downscaled to 500 px (david.png stays 192 px); deck rebuilt with the unchanged make_slides.py, 9,8 MB to 4,6 MB, content unchanged
 
 ## 2. Interface (read-only copy)
 
@@ -242,7 +243,7 @@ Antworten aus dem Raum nur auf Folie 4 (Handzeichen), 5 und 10; alle anderen Che
 | X3 | Automatische Prüfungen bei jedem Änderungsvorschlag | Inhaltsverzeichnis aktuell; Pflichtfelder vorhanden; Links lösen auf; keine Mailadressen oder Telefonnummern; Stempel nur von der Person, die bestätigt hat | Diese Prüfungen laufen in der CI von GitLab (`wiki.py index --check`, `people --check`, `lint`, `privacy`, `reviewers`). | Liste |
 | X4 | Wer darf was ändern | Frei: neue Seiten, Themenseiten; nach Ja: Änderungen an bestehenden Seiten und Personenseiten; nur auf eigenes Wort: Arbeitsweise und Ansprache auf der eigenen Personenseite | Die Stufen stehen in der Regeldatei; jede Änderung landet trotzdem nur über einen freigegebenen Änderungsvorschlag im Wiki. | Tabelle in drei Zeilen |
 | X5 | Was nie ins Wiki kommt | Daten von Teilnehmenden; private Mailadressen und Telefonnummern; Bewertungen von Kolleg:innen; als vertraulich markierte Details; alles, was eine Person aus einer Sprechstunde erkennbar macht | Ein Prüfskript lässt jeden Änderungsvorschlag scheitern, der Mailadressen oder Telefonnummern enthält; der Rest ist Regel für die KI und Prüfpunkt für Menschen. | Liste |
-| X6 | Zum Nachlesen | Andrej Karpathy, LLM Wiki: https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f; Überblick: https://blog.starmorph.com/blog/karpathy-llm-wiki-knowledge-base-guide; README dieser Sitzung mit den vier Fragen und den Folien | none | Links und QR-Code zum README |
+| X6 | Zum Nachlesen | Andrej Karpathy, LLM Wiki: https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f; Überblick: https://blog.starmorph.com/blog/karpathy-llm-wiki-knowledge-base-guide; README dieser Sitzung mit den vier Fragen und den Folien; Verweis auf die Wiki-Vorlage aus Issue #2 (fügt Hanno Müller ein, sobald veröffentlicht) | none | Links und QR-Code zum README |
 | X7 | Umsetzungen aus der Community | Tabelle mit Projekt, Beschreibung, Link: llmwiki (Dokumente hochladen, Claude über MCP verbinden, Wiki schreiben lassen), github.com/lucasastorian/llmwiki; obsidian-wiki (Rahmen für KI-Agenten, die Obsidian-Wikis nach Karpathys Muster bauen), github.com/Ar9av/obsidian-wiki; second-brain (von einem LLM gepflegte persönliche Wissensbasis für Obsidian), github.com/NicholasSpisak/second-brain; llm-wiki-compiler (verdichtet Markdown-Dateien zu Wikis nach Themen), github.com/ussumant/llm-wiki-compiler; CacheZero (das Muster als ein npm-Paket), news.ycombinator.com/item?id=47667723; wiki-skills (Claude-Code-Skills für das Muster), github.com/kfchou/wiki-skills; LLM Wiki v2 (erweitertes Muster mit Gedächtnis-Lebenszyklus und Vertrauenswerten), gist.github.com/rohitg00/2067ab416f7bbe447c1977edaaa681e2; Fußzeile: Quelle Starmorph, "How to Build Karpathy's LLM Wiki", 2026-04-09 | Für Rückfragen: Unser Wiki ist eine eigene Umsetzung mit Claude Code, GitLab und einer Regeldatei; LLM Wiki v2 hat wie wir Vertrauenswerte. | Tabelle, kleine Schrift |
 
 ## 4. Internal bridges

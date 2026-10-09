@@ -21,6 +21,8 @@
   - 2026-10-09 meta plan confirmed by Hanno Müller with these adjustments ("Include adjustments and then continue"); open decisions 1 (Abschluss 2 min) and 4 (README als Take-away) taken as recommended, 2 and 3 move to S1.2 and S1.1 planning
   - 2026-10-09 from the S1.1 review: Entscheidungscheck in zwei Paaren (Umfang gegen Hosting, Zufluss gegen Prüfende), Umfang in Seiten statt Dokumenten, Faustwert 1.000 Seiten; Satz zur Vorbereitung in der Vorab-Kommunikation; Seitenzahl rund 140; confirmed by Hanno Müller with "Start creating the slides"
   - 2026-10-09 change C1 confirmed by Hanno Müller ("The slides should work without this information"): no numbers for work time or changes per week; S1.1 interface version 2
+  - 2026-10-09 repository moved to ~/Workshops/workshop-rag-forum; first commit on branch feature/261102-llm-wiki
+  - 2026-10-09 note by Hanno Müller: share the wiki maintenance skills from kisz-marketplace after a /security-review; Hanno adds the reference to the slides himself (section 8)
 
 ## 2. Learner
 
@@ -156,6 +158,9 @@ Messwerte (2026-10-09, Tokenizer `o200k_base`, vor dem Talk neu messen): Inhalts
 - Interaction: Handzeichen in S1.1 (Abschnitt B0, rund 0,5 min) und Kontrollfrage nach Abschnitt B; Q&A in S1.2; drei Gruppenrunden und ein Abschluss-Handzeichen in S1.3. Nach Abzug der Neuverteilung reden die Teilnehmenden rund 27 der 67 geplanten Minuten untereinander. Beobachtung der Gruppen: KISZ-Kolleg:innen gehen zwischen den Gruppen herum, TBD (ask Hanno Müller, at the S1.3 planning).
 - Time-content balance: Geplant sind 20 + 15 + 32 = 67 von 90 min (74 %). Schätzung mit Begrüßung (5 min), Demo-Zuschlag (mal 1,3, also 19,5 min) und Neuverteilung von rund 20 Personen (rund 1 min pro Runde, innerhalb der 10 min): 5 + 20 + 19,5 + 32 = 76,5 von 90 min (85 %), rund 13 min Networking. Voraussetzung: S1.1 hält 20 min; der Presenter schätzte die erste Übersicht auf 23,5 min, der S1.1-Plan kürzt deshalb (Vorschläge im Parkplatz). Kürzung im Ernstfall: Abschnitt B (Karpathy nur gesprochen), nicht Abschnitt E, weil Runde 3 die Abläufe aus E braucht.
 - Open decisions for Hanno Müller: Aufteilung S1.2, bei der Planung von S1.2.
+- Vorlage zum Nachbauen (Notiz von Hanno Müller, 2026-10-09): Statt einzelne Skills aus dem kisz-marketplace zu kopieren, entsteht eine eigenständige, generische Vorlage für ein LLM-Wiki ohne sensible Inhalte, konfigurierbar für eigene Daten, Quellen, Seitenstruktur und Harness, möglichst mit offenen Werkzeugen und Modellen über eine OpenAI-kompatible API. Planung und Ziele: Issue https://github.com/aihpi/workshop-rag-forum/issues/2, Branch `feature/261102-llm-wiki-template` (von `main`).
+  - Vor dem Mergen: `/security-review` auf dem Branch, ohne Befund zu sensiblen Inhalten (Namen von Kolleg:innen und Partnern, interne Adressen und Pfade, Chat-Kanäle und Webhooks, Tokens, Inhalte des KISZ-Wikis).
+  - Folien: Den Verweis auf die Vorlage fügt Hanno Müller selbst in die Folien ein (S1.1, Folie 12 und Anhang X6); das Take-away-README verlinkt sie ebenfalls.
 
 ## 9. Change log
 
