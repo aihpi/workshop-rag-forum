@@ -129,7 +129,8 @@ class VectorStore:
         chunks_path = directory / "chunks.parquet"
         if not chunks_path.exists():
             raise FileNotFoundError(
-                f"no store at {directory}; run `workshop-rag ingest` first"
+                f"no store at {directory}; build and save one first "
+                "(for the bias study: `rag-bias build-corpus`)"
             )
         frame = pd.read_parquet(chunks_path)
         chunks = [

@@ -1,4 +1,4 @@
-"""A RAG pipeline and a harness for measuring bias in it.
+"""The RAG pipeline shared by the forum's meetings.
 
 Typical use:
 
@@ -12,20 +12,11 @@ Typical use:
     pipeline = RagPipeline(DenseRetriever(store, embedder), top_k=5)
     print(pipeline.retrieve("Who led the migration?"))
 
-The bias harness lives in `workshop_rag_forum.bias`. The CLI is
-`workshop_rag_forum.cli`, deliberately not re-exported here: it imports from this
-package, so pulling it back in would make the import graph cyclic.
+Code that only one meeting needs lives in that meeting's folder and imports
+from here, never the other way round. The bias study, for example, is the
+`rag_bias` package in `01_event/260901-rag-bias/`.
 """
 
-from .biographies import (
-    DEFAULT_OCCUPATIONS,
-    GROUPS,
-    Occupation,
-    base_rates,
-    build_documents,
-    fetch_population,
-    sample_population,
-)
 from .chunking import chunk_document, chunk_documents, split_words
 from .config import ConfigError, Settings, get_settings
 from .embedding import Embedder, HashEmbedder, OpenAIEmbedder, l2_normalise
@@ -56,15 +47,8 @@ __all__ = [
     "VectorStore",
     "chunk_document",
     "chunk_documents",
-    "DEFAULT_OCCUPATIONS",
-    "GROUPS",
-    "Occupation",
-    "base_rates",
-    "build_documents",
     "get_settings",
     "l2_normalise",
-    "fetch_population",
-    "sample_population",
     "parse_citations",
     "split_words",
 ]

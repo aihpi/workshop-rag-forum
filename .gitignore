@@ -3,6 +3,8 @@
 *.orig
 tmp/
 trash/
+# Office lock files (PowerPoint, Word, Excel)
+~$*
 attic/
 .kash/
 
