@@ -7,7 +7,7 @@ Repository = "https://github.com/aihpi/workshop-rag-forum"
 
 [project]
 name = "workshop-rag-forum"
-description = "A forum for monthly meetings centred around Retrieval-Augmented Generation (RAG)."
+description = "A forum for regular meetings centred around Retrieval-Augmented Generation (RAG)."
 authors = [
     { name="hanno-mueller-HPI", email="hanno.mueller@hpi.de" },
 ]

@@ -5,7 +5,7 @@ Three variants, because the bias questions are mostly comparisons between them:
 * `DenseRetriever`      - exact cosine, the reference behaviour.
 * `MMRRetriever`        - diversity-aware reranking; a mitigation lever for
                           source concentration.
-* `TurboVecRetriever`   - quantised search, reusing the 260615 meeting's index,
+* `TurboVecRetriever`   - quantised search with turbovec, the 260615 topic,
                           so "what does compression cost?" can be asked about
                           *who* gets retrieved rather than only recall@k.
 """
@@ -123,9 +123,10 @@ class TurboVecRetriever(DenseRetriever):
         super().__init__(store, embedder)
         try:
             from turbovec import TurboQuantIndex  # type: ignore[import-untyped]
-        except ImportError as error:  # pragma: no cover - optional dependency
+        except ImportError as error:  # pragma: no cover
             raise ImportError(
-                "TurboVecRetriever needs the `turbovec` package (uv add turbovec)"
+                "TurboVecRetriever needs the `turbovec` package; "
+                "run `uv sync --all-packages` from the repository root"
             ) from error
         self.bit_width: int = bit_width
         self._index: Any = TurboQuantIndex(dim=store.dim, bit_width=bit_width)

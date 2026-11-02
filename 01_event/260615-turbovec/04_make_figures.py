@@ -1,7 +1,7 @@
 """Render comparison figures from data/results.json.
 
 Produces, into this meeting folder:
-  fig_storage_size.png     absolute store size (float32 baseline vs 2/4/8-bit)
+  fig_storage_size.png     absolute store size (float32 baseline vs 2/3/4-bit)
   fig_compression_ratio.png compression factor vs float32
   fig_recall.png           recall@k vs bit-width
   fig_tradeoff.png         storage-vs-recall trade-off
@@ -29,7 +29,7 @@ def main() -> None:
     k = r["top_k"]
 
     tv = r["turbovec"]
-    widths = sorted(tv, key=lambda key: tv[key]["bits_per_dim"])  # e.g. ["2bit","4bit","8bit"]
+    widths = sorted(tv, key=lambda key: tv[key]["bits_per_dim"])  # e.g. ["2bit","3bit","4bit"]
     labels = [w.replace("bit", "-bit") for w in widths]
     sizes_mb = [tv[w]["bytes"] / 1e6 for w in widths]
     ratios = [tv[w]["compression_ratio"] for w in widths]

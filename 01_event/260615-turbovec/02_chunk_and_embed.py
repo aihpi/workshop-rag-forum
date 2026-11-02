@@ -1,7 +1,8 @@
 """Chunk the downloaded Wikipedia articles and embed them with a local model.
 
-Reads the parquet shards from data/dewiki/, splits each article into ~512-token
-chunks (approximated by a word count), and embeds the chunks through an
+Reads the parquet shards from data/dewiki/, splits each article into chunks aimed at the
+256-token minilm input cap (a 90-word window and a character guard; a chunk the
+endpoint still rejects is shrunk and retried), and embeds the chunks through an
 OpenAI-compatible endpoint (minilm-embedding by default, configured in .env).
 
 Vectors are stored as float32 .npy shards under data/embeddings/. The step is

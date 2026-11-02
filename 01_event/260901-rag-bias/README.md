@@ -1,11 +1,14 @@
 # Meeting 260901: Bias im RAG
 
 Code for the empirical part of the session: it produces the numbers behind
-**Teil B (Ergebnisse)** and the material for **Teil D (Selbstkritik)**.
+**Teil B (Ergebnisse)** and the material for **Teil D (Selbstkritik)** of the
+slide outline, which is not in this repository.
 
 - **[METHOD.md](METHOD.md)**: what is measured and why. The data sources, the
   R/K corpus variants, the metric $A = p_k/p_0$, the nDCG and length-tercile
   additions, and the reasoning behind all of it.
+- **[ARCHITECTURE.md](ARCHITECTURE.md)**: how the code is organised. The two
+  packages, the `attrs` contract, the Protocol seams, the on-disk layout.
 - **This file**: how to run it, what comes out, and what not to trust.
 
 The meeting ships two packages: `workshop_rag_forum`, a small, complete RAG
@@ -107,7 +110,7 @@ environment.
   | `tradeoff` | one row per DetGreedy step: `lambda`, targets, $A$, $p_k$, nDCG |
   | `k_fully_reached` | which $k$ survived person-deduplication, so a short ranking is not read as a result |
 
-- Figures in this folder:
+- Figures `03_make_figures.py` writes into this folder:
   - `fig_amplification_{R,K}_k{10,100}.png`: $A$ per occupation and group, with CIs.
   - `fig_base_vs_topk_*.png`: $p_0$ against $p_k$, before the division.
   - `fig_variants_k10.png`: R against K side by side.
@@ -121,7 +124,7 @@ so a figure can always be traced to the run that made it.
 
 ## Known limitations
 
-Material for Gruppenarbeit 2. These are properties of *this measurement*, not of
+Material for Gruppenarbeit 2 of the slide outline. These are properties of *this measurement*, not of
 RAG in general.
 
 - **The bootstrap resamples retrieved slots, holding $p_0$ fixed.** $p_0$ is a

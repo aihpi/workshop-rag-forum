@@ -7,7 +7,7 @@ per bit-width (same as 03), and times a batch of queries against:
 
 Each search is repeated REPEATS times; the median wall-time is reported as mean
 latency per query (ms) and throughput (queries/s). Latency fields are merged into
-data/results.json so 06_make_latency_figure / the slides can read real numbers.
+data/results.json so 06_make_slides.py can read real numbers.
 """
 
 from __future__ import annotations

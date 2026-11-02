@@ -4,7 +4,7 @@
 
 # workshop-rag-forum
 
-A forum for monthly meetings centred around **Retrieval-Augmented Generation (RAG)**.
+A forum for regular meetings centred around **Retrieval-Augmented Generation (RAG)**.
 Each meeting explores a different topic (embedding models, vector compression,
 retrieval strategies, evaluation, etc.).
 
@@ -47,9 +47,10 @@ installs everything into one `.venv`.
 
 ## Documentation
 
-- [ARCHITECTURE.md](ARCHITECTURE.md): how the repository and the pipeline are
-  organised. Module map, the `attrs` contract, the Protocol seams, on-disk layout.
-- Each meeting folder has its own README with how to run it and what comes out.
+- [development.md](development.md): developer workflows, the uv workspace, how
+  to add a meeting.
+- Each meeting folder has its own README with how to run it and what comes out;
+  where the code needs explaining, an ARCHITECTURE.md next to it.
 
 ## Setup
 

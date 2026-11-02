@@ -2,9 +2,10 @@
 
 What this session measures and why the measurement is built the way it is. For
 commands, outputs and known limitations see [README.md](README.md); for the
-pipeline this sits on top of see [ARCHITECTURE.md](../../ARCHITECTURE.md).
+pipeline this sits on top of see [ARCHITECTURE.md](ARCHITECTURE.md).
 
-The slide outline is the reference. This document covers **Teil A §5–6** (the
+The slide outline, which is not in this repository, is the reference for the
+section numbers below. This document covers **Teil A §5–6** (the
 dataset and how we measure) together with **§10–11** (the covariate control and
 the reranking trade-off), and supplies the reasoning behind **Teil B**.
 
