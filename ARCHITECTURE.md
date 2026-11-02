@@ -2,7 +2,7 @@
 
 How this repository is organised and why: the parts that outlive any single
 meeting. For the 260901 session's method see
-[03_workshop/260901-rag-bias/METHOD.md](03_workshop/260901-rag-bias/METHOD.md).
+[01_event/260901-rag-bias/METHOD.md](01_event/260901-rag-bias/METHOD.md).
 For setup see [installation.md](installation.md); for developer workflows see
 [development.md](development.md).
 
@@ -13,29 +13,44 @@ Two things that are deliberately kept apart:
 1. **A reusable RAG pipeline** in `src/workshop_rag_forum/`. Stable across
    meetings. Every stage is swappable, which is the whole point: a meeting's
    question is usually "what changes if I swap *this* stage?"
-2. **One folder per meeting** in `03_workshop/YYMMDD-topic/`. Meeting folders are
-   thin drivers plus documentation plus figures. They may be messy and dated; the
-   package may not.
+2. **One folder per meeting** in `01_event/YYMMDD-topic/`. Meeting folders hold
+   documentation, figures, driver scripts and, where a meeting needs code of its
+   own, a package of their own. They may be dated; the shared package may not.
 
-The rule of thumb: if a second meeting could use it, it belongs in the package.
-The same rule applies to documentation. This file holds what is durable;
-meeting folders hold what is specific to one question.
+The rule of thumb: if a second meeting could use it, it belongs in the shared
+package; if only one meeting uses it, it lives in that meeting's folder. The
+dependency runs one way only: a meeting imports from `workshop_rag_forum`, never
+the reverse. The same rule applies to documentation. This file holds what is
+durable; meeting folders hold what is specific to one question.
+
+The repository is a **uv workspace**. The root `pyproject.toml` is the shared
+package; every meeting with code is a workspace member with its own
+`pyproject.toml`, so its dependencies (turbovec, matplotlib, the Wikidata client)
+never leak into the shared package. One `uv.lock` and one `.venv` cover all of
+them: `uv sync --all-packages --all-extras`, which is what `make install` and CI
+run.
+
+| Member | Folder | Kind |
+|---|---|---|
+| `workshop-rag-forum` | repository root | the shared pipeline, `src/workshop_rag_forum/` |
+| `turbovec-demo` | `01_event/260615-turbovec/` | standalone scripts, not a package (`tool.uv.package = false`) |
+| `rag-bias` | `01_event/260901-rag-bias/` | package `rag_bias` in its `src/`, with tests and the `rag-bias` command |
+
+A meeting without code, such as `261102-llm-wiki`, has no `pyproject.toml` and is
+not a member.
 
 ## Top-level layout
 
 ```
-├── src/workshop_rag_forum/   the pipeline and the bias study (the only importable code)
-├── tests/                    pytest suite for the package; no network
-├── 03_workshop/              one folder per meeting
-│   ├── 260615-turbovec/        vector compression vs. a float32 baseline
-│   └── 260901-rag-bias/        retrieval bias (see its METHOD.md and README.md)
+├── src/workshop_rag_forum/   the shared pipeline
+├── tests/                    pytest suite for the shared pipeline; no network
+├── 01_event/                 one folder per meeting
+│   ├── 260615-turbovec/        vector compression vs. a float32 baseline; scripts + pyproject.toml
+│   ├── 260901-rag-bias/        retrieval bias; src/rag_bias/, tests/, pyproject.toml (see its METHOD.md and README.md)
+│   └── 261102-llm-wiki/        LLM wiki instead of RAG: slides and starter skills, no code
 ├── 00_aisc/img/              AISC and funder logos used in the READMEs
-├── devtools/lint.py          codespell + ruff + basedpyright, invoked by `make lint`
+├── devtools/lint.py          codespell + ruff + basedpyright, invoked by `make lint` and CI
 ├── data/                     generated corpora, indexes, results (gitignored)
-├── docs/                     (empty) long-form documentation
-├── notebooks/                (empty) exploratory notebooks
-├── references/               (empty) papers, specs, external material
-├── reports/                  (empty) generated reports
 ├── .github/workflows/        ci.yml (lint + test) and buld_publish.yml
 │
 ├── ARCHITECTURE.md           this file
@@ -44,18 +59,17 @@ meeting folders hold what is specific to one question.
 ├── development.md            developer workflows and IDE setup
 ├── publishing.md             release/publishing notes (from the template)
 ├── Makefile                  install · lint · test · build · clean · upgrade
-├── pyproject.toml            dependencies, entry points, ruff/basedpyright/pytest config
-├── uv.lock                   resolved dependency lockfile
+├── pyproject.toml            shared package, workspace members, ruff/basedpyright/pytest config
+├── uv.lock                   resolved dependency lockfile for the whole workspace
 ├── .env_example              copy to .env; endpoint URL, key, model names
 ├── .gitignore                excludes data/, .env, build artefacts
 ├── .copier-answers.yml       provenance from the aihpi/template-ai-project template
 └── LICENSE                   MIT
 ```
 
-The four empty directories carry a `.gitkeep` and come from the project
-template. They are kept so generated output has a conventional home.
+## The shared package
 
-## The package
+`src/workshop_rag_forum/`:
 
 | Module | What it does |
 |---|---|
@@ -64,11 +78,21 @@ template. They are kept so generated output has a conventional home.
 | `chunking.py` | Splits a document into overlapping word windows. Never truncates: an over-long window is split again on a word boundary, so no source text is silently lost. |
 | `embedding.py` | Turns text into unit-normalised vectors. `OpenAIEmbedder` talks to any OpenAI-compatible endpoint and shrinks-and-retries when the endpoint rejects an input as too long; `HashEmbedder` is a deterministic offline stand-in. |
 | `store.py` | `VectorStore` holds chunks and their vectors **row-aligned**, does exact cosine top-k, and persists to parquet + `.npy`. Validates the alignment on construction. |
-| `retrieval.py` | Query text in, ranked `RetrievedChunk`s out. `DenseRetriever` (plain cosine), `MMRRetriever` (diversity reranking), `DetGreedyRetriever` (fairness-aware reranking: a minimum share per group in every prefix), `TurboVecRetriever` (quantised search reusing the 260615 index). |
+| `retrieval.py` | Query text in, ranked `RetrievedChunk`s out. `DenseRetriever` (plain cosine), `MMRRetriever` (diversity reranking), `TurboVecRetriever` (quantised search reusing the 260615 index; needs the `turbovec` extra). |
 | `generation.py` | Builds a numbered-context prompt, calls the chat model, and parses the `[n]` citations back out, so it is recorded which passages the answer actually used. |
 | `pipeline.py` | `RagPipeline`: a retriever plus an optional generator. Generation is optional so retrieval-only studies need no chat model. |
-| `biographies.py` | Builds the 260901 study corpus. The one module tied to a specific meeting; documented in that meeting's METHOD.md. |
-| `cli.py` | The `workshop-rag` command: `build-corpus`, `query`, `study`, `show`. |
+
+## A meeting package: rag_bias
+
+`01_event/260901-rag-bias/src/rag_bias/` is the worked example of a meeting with
+code of its own. It imports the pipeline above and adds what only the bias study
+needs; its method is documented in that meeting's METHOD.md.
+
+| Module | What it does |
+|---|---|
+| `biographies.py` | Builds the study corpus: German Wikipedia biographies labelled from Wikidata, in the R and K variants. |
+| `rerank.py` | `DetGreedyRetriever` and `rerank_detgreedy`: fairness-aware reranking, a minimum share per group in every prefix. |
+| `cli.py` | The `rag-bias` command: `build-corpus`, `query`, `study`, `show`. |
 | `bias/ratio.py` | The headline metric A = p_k/p0, its bootstrap intervals and its refusal rules. |
 | `bias/quality.py` | nDCG@k against binary occupation relevance, so a fairness intervention can be priced in the ranking quality it costs. |
 | `bias/covariate.py` | Article length as a covariate, controlled by recomputing A inside length terciles rather than by fitting a model. |
@@ -220,7 +244,7 @@ such a rebuild, so only the embedding is paid for again.
 ## CLI
 
 ```
-workshop-rag [--offline] <command>
+rag-bias [--offline] <command>
 
   build-corpus   fetch source data, sample a variant, embed, save a store
   query          run one query through retrieval (+ generation if configured)
@@ -228,22 +252,27 @@ workshop-rag [--offline] <command>
   show           print a saved results file
 ```
 
-Meeting scripts are thin wrappers that call `cli.main()`. The logic lives in the
-package; a meeting folder only sequences it and renders figures.
+The command comes from the `rag-bias` workspace member. The 260901 driver
+scripts are thin wrappers that call `rag_bias.cli.main()`; the logic lives in the
+packages, and a script only sequences it and renders figures.
 
 ## Tests
 
 74 tests, no network. External data is passed in as fixtures rather than
-fetched.
+fetched. `uv run pytest` runs both suites.
 
 | File | Covers |
 |---|---|
-| `test_chunking.py` | no word is lost, overlap is exact, over-long windows split rather than truncate |
-| `test_store.py` | row alignment, exact cosine ordering, parquet round trip with typed `attrs` |
-| `test_ratio.py` | the metric's arithmetic, scale-freeness, both refusal rules, relevant-set filtering |
-| `test_biographies.py` | corpus variants preserve or equalise the split, cannot invent people, person-level pooling |
-| `test_retrieval.py` | DetGreedy's prefix guarantee, that it never invents or drops candidates, MMR and quantised search |
-| `test_study.py` | person-deduplication, the trade-off sweep's endpoints, tercile restriction on both sides of the ratio, nDCG |
+| `tests/test_chunking.py` | no word is lost, overlap is exact, over-long windows split rather than truncate |
+| `tests/test_store.py` | row alignment, exact cosine ordering, parquet round trip with typed `attrs` |
+| `tests/test_retrieval.py` | dense and MMR retrieval, citation parsing, the pipeline with and without a generator |
+| `01_event/260901-rag-bias/tests/test_ratio.py` | the metric's arithmetic, scale-freeness, both refusal rules, relevant-set filtering |
+| `01_event/260901-rag-bias/tests/test_biographies.py` | corpus variants preserve or equalise the split, cannot invent people, person-level pooling |
+| `01_event/260901-rag-bias/tests/test_rerank.py` | DetGreedy's prefix guarantee, that it never invents or drops candidates, target normalisation |
+| `01_event/260901-rag-bias/tests/test_study.py` | person-deduplication, the trade-off sweep's endpoints, tercile restriction on both sides of the ratio, nDCG |
+
+Test file names must stay unique across both folders, because pytest imports
+them by basename.
 
 `test_ratio.py` is the important one: every case pins a property whose correct
 answer is known by construction, because that file carries the study's claims.
@@ -253,8 +282,9 @@ answer is known by construction, because that file carries the study's claims.
 - **Meeting folders** are `YYMMDD-topic/`. A README covers how to run it and what
   comes out; where the method needs arguing, a METHOD.md covers why.
 - **`make lint`** runs codespell, `ruff check --fix`, `ruff format` and
-  basedpyright over `src`, `tests`, `devtools`, reformatting in place. Meeting
-  scripts are deliberately out of scope.
+  basedpyright over `src`, `tests`, `devtools` and the `src` and `tests` of
+  every meeting package, reformatting in place. Meeting driver scripts are
+  deliberately out of scope.
 - **basedpyright runs clean**: zero errors *and* zero warnings. The three
   `reportUnknown*` rules are disabled in `pyproject.toml` because they fire only
   on values flowing out of numpy/pandas/pytest stubs; every rule that checks our
@@ -268,13 +298,21 @@ answer is known by construction, because that file carries the study's claims.
 key in `Document.attrs` at build time and pass `attr="your_key"`; the metric
 itself is attribute-agnostic.
 
-**Add a retriever.** Implement the `Retriever` protocol and register it in
+**Add a retriever.** Implement the `Retriever` protocol. A general one goes in
+`workshop_rag_forum/retrieval.py`, one tied to a single study in that meeting's
+package (as `rag_bias/rerank.py` does). Register it in the meeting's
 `cli._retriever`. `MMRRetriever` is the shortest example of one that wraps
 another.
 
 **Add a corpus.** Emit `Document`s with whatever labels the study needs in
-`attrs`. `biographies.py` is the worked example.
+`attrs`. `rag_bias/biographies.py` is the worked example.
 
-**Add a meeting.** Create `03_workshop/YYMMDD-topic/` with driver scripts that
-call into the package. Resist putting logic there; if a second meeting could use
-it, it belongs in `src/`.
+**Add a meeting.** Create `01_event/YYMMDD-topic/`. A meeting without code needs
+nothing else. A meeting with scripts adds a `pyproject.toml` with its own
+dependencies and `tool.uv.package = false` (see `260615-turbovec`). A meeting
+with importable code adds a package under its own `src/`, tests, and a
+`pyproject.toml` that depends on `workshop-rag-forum` as a workspace source (see
+`260901-rag-bias`); add its `src` and `tests` to `testpaths` and
+`[tool.basedpyright]` in the root `pyproject.toml` and to `SRC_PATHS` in
+`devtools/lint.py`. Either way, list the folder under `[tool.uv.workspace]
+members`. If a second meeting could use the code, it belongs in `src/` instead.

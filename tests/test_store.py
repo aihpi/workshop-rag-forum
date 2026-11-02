@@ -71,7 +71,7 @@ def test_round_trip_through_disk(tmp_path: Path):
 
 
 def test_load_missing_store_explains_itself(tmp_path: Path):
-    with pytest.raises(FileNotFoundError, match="ingest"):
+    with pytest.raises(FileNotFoundError, match="build and save one first"):
         VectorStore.load(tmp_path / "nope")
 
 

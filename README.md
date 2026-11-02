@@ -21,15 +21,16 @@ Each meeting we pick one, dig in together, and compare problems, stacks, and ide
 ## Repository layout
 
 ```
-src/workshop_rag_forum/   # the RAG pipeline and the bias study
-  chunking, embedding, store, retrieval, generation, pipeline, cli
-  biographies.py          # Wikidata-labelled dewiki corpus (P21 gender, P106 occupation)
-  bias/                   # ratio.py = A = p_k/p0, study.py = the runner
-03_workshop/              # one folder per meeting: YYMMDD-topic/
-  260615-turbovec/        # vector compression (see its README)
-  260901-rag-bias/        # measuring retrieval bias (see its README)
+src/workshop_rag_forum/   # the shared RAG pipeline, used by every meeting
+  chunking, embedding, store, retrieval, generation, pipeline
+tests/                    # pytest suite for src/
+01_event/                 # one folder per meeting: YYMMDD-topic/
+  260615-turbovec/        # vector compression; standalone scripts + pyproject.toml
+  260901-rag-bias/        # retrieval bias; own package, tests + pyproject.toml
+    src/rag_bias/         # biographies corpus, bias/ metrics, DetGreedy, `rag-bias` CLI
+  261102-llm-wiki/        # LLM wiki instead of RAG, with starter skills; no code
+devtools/                 # lint script behind `make lint` and CI
 data/                     # corpora, indexes & results (gitignored)
-notebooks/ docs/ reports/ references/ tests/
 .env_example              # copy to .env and fill in your endpoint + key
 ```
 
@@ -43,8 +44,15 @@ compare stages against each other:
 |-------|-----------------|
 | Embedding | `OpenAIEmbedder` (any OpenAI-compatible endpoint, incl. a LiteLLM proxy), `HashEmbedder` (deterministic, offline) |
 | Store | `VectorStore`, with text, labels and vectors persisted **together**, exact cosine search |
-| Retrieval | `DenseRetriever`, `MMRRetriever` (relevance diversification), `DetGreedyRetriever` (fairness-aware reranking), `TurboVecRetriever` (quantised, reusing the 260615 index) |
+| Retrieval | `DenseRetriever`, `MMRRetriever` (relevance diversification), `TurboVecRetriever` (quantised, reusing the 260615 index) |
 | Generation | `OpenAIGenerator` (citation-grounded prompting), `EchoGenerator` (offline stub) |
+
+The repository is a [uv workspace](https://docs.astral.sh/uv/concepts/projects/workspaces/):
+the root project is the shared pipeline, and every meeting with code is a
+member with its own `pyproject.toml` and dependencies. Code that only one
+meeting needs lives in that meeting's folder and imports from the pipeline,
+never the other way round. `make install` (`uv sync --all-packages --all-extras`)
+installs everything into one `.venv`.
 
 ## Measuring retrieval bias
 
@@ -57,10 +65,12 @@ and what fairness-aware reranking costs in ranking quality.
 ```bash
 cp .env_example .env      # OPENAI_API_BASE / _API_KEY / _EMBEDDING_MODEL
 
-uv run workshop-rag build-corpus --variant R    # realistic gender split
-uv run workshop-rag build-corpus --variant K    # downsampled to 50/50
-uv run workshop-rag study --variant R --ks 10,100
-uv run workshop-rag show --variant R
+uv sync --all-packages    # installs the pipeline and the rag-bias package
+
+uv run rag-bias build-corpus --variant R    # realistic gender split
+uv run rag-bias build-corpus --variant K    # downsampled to 50/50
+uv run rag-bias study --variant R --ks 10,100
+uv run rag-bias show --variant R
 ```
 
 Add `--offline` to exercise the pipeline with hash embeddings and no endpoint:
@@ -68,16 +78,17 @@ useful for checking the plumbing, never for a reported number.
 
 ## Meetings
 
-| Date     | Topic     | Folder                          | Summary                                              |
-|----------|-----------|---------------------------------|------------------------------------------------------|
-| 26-06-15 | turbovec  | `03_workshop/260615-turbovec/`  | Illustrating turbovec vector compression vs. a float32 embedding baseline |
-| 26-09-01 | rag-bias  | `03_workshop/260901-rag-bias/`  | Bias im RAG: measuring A = p_k/p₀ across occupations, with a realistic and a 50/50 corpus |
+| Date     | Topic     | Folder                        | Summary                                              |
+|----------|-----------|-------------------------------|------------------------------------------------------|
+| 26-06-15 | turbovec  | [`01_event/260615-turbovec/`](01_event/260615-turbovec/) | Illustrating turbovec vector compression vs. a float32 embedding baseline |
+| 26-09-01 | rag-bias  | [`01_event/260901-rag-bias/`](01_event/260901-rag-bias/) | Bias im RAG: measuring A = p_k/p₀ across occupations, with a realistic and a 50/50 corpus |
+| 26-11-02 | llm-wiki  | [`01_event/261102-llm-wiki/`](01_event/261102-llm-wiki/) | Das KISZ-Wiki: why the team keeps its own knowledge in an LLM-maintained wiki instead of RAG; slides and generic skills to start your own wiki |
 
 ## Documentation
 
 - [ARCHITECTURE.md](ARCHITECTURE.md): how the repository and the pipeline are
   organised. Module map, the `attrs` contract, the Protocol seams, on-disk layout.
-- [03_workshop/260901-rag-bias/METHOD.md](03_workshop/260901-rag-bias/METHOD.md):
+- [01_event/260901-rag-bias/METHOD.md](01_event/260901-rag-bias/METHOD.md):
   the bias study's method. Data sources, corpus variants, and the metric.
 
 ## Setup

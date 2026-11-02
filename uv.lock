@@ -10,6 +10,13 @@ resolution-markers = [
     "python_full_version < '3.14' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 
+[manifest]
+members = [
+    "rag-bias",
+    "turbovec-demo",
+    "workshop-rag-forum",
+]
+
 [[package]]
 name = "aiohappyeyeballs"
 version = "2.6.2"
@@ -1983,6 +1990,27 @@ wheels = [
 ]
 
 [[package]]
+name = "rag-bias"
+version = "0.1.0"
+source = { editable = "01_event/260901-rag-bias" }
+dependencies = [
+    { name = "httpx" },
+    { name = "matplotlib" },
+    { name = "numpy" },
+    { name = "typing-extensions" },
+    { name = "workshop-rag-forum", extra = ["turbovec"] },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "httpx", specifier = ">=0.28.1" },
+    { name = "matplotlib", specifier = ">=3.11.0" },
+    { name = "numpy", specifier = ">=2.4.6" },
+    { name = "typing-extensions", specifier = ">=4.15.0" },
+    { name = "workshop-rag-forum", extras = ["turbovec"], editable = "." },
+]
+
+[[package]]
 name = "requests"
 version = "2.34.2"
 source = { registry = "https://pypi.org/simple" }
@@ -2099,6 +2127,41 @@ wheels = [
 ]
 
 [[package]]
+name = "turbovec-demo"
+version = "0.1.0"
+source = { virtual = "01_event/260615-turbovec" }
+dependencies = [
+    { name = "datasets" },
+    { name = "defusedxml" },
+    { name = "huggingface-hub" },
+    { name = "matplotlib" },
+    { name = "numpy" },
+    { name = "openai" },
+    { name = "pandas" },
+    { name = "pyarrow" },
+    { name = "python-dotenv" },
+    { name = "python-pptx" },
+    { name = "tqdm" },
+    { name = "turbovec" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "datasets", specifier = ">=5.0.0" },
+    { name = "defusedxml", specifier = ">=0.7.1" },
+    { name = "huggingface-hub", specifier = ">=1.19.0" },
+    { name = "matplotlib", specifier = ">=3.11.0" },
+    { name = "numpy", specifier = ">=2.4.6" },
+    { name = "openai", specifier = ">=2.41.1" },
+    { name = "pandas", specifier = ">=3.0.3" },
+    { name = "pyarrow", specifier = ">=24.0.0" },
+    { name = "python-dotenv", specifier = ">=1.2.2" },
+    { name = "python-pptx", specifier = ">=1.0.2" },
+    { name = "tqdm", specifier = ">=4.68.2" },
+    { name = "turbovec", specifier = ">=0.8.0" },
+]
+
+[[package]]
 name = "typer"
 version = "0.25.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2156,20 +2219,17 @@ wheels = [
 name = "workshop-rag-forum"
 source = { editable = "." }
 dependencies = [
-    { name = "datasets" },
-    { name = "defusedxml" },
-    { name = "httpx" },
-    { name = "huggingface-hub" },
-    { name = "matplotlib" },
     { name = "numpy" },
     { name = "openai" },
     { name = "pandas" },
     { name = "pyarrow" },
     { name = "python-dotenv" },
-    { name = "python-pptx" },
-    { name = "tqdm" },
-    { name = "turbovec" },
     { name = "typing-extensions" },
+]
+
+[package.optional-dependencies]
+turbovec = [
+    { name = "turbovec" },
 ]
 
 [package.dev-dependencies]
@@ -2185,21 +2245,15 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "datasets", specifier = ">=5.0.0" },
-    { name = "defusedxml", specifier = ">=0.7.1" },
-    { name = "httpx", specifier = ">=0.28.1" },
-    { name = "huggingface-hub", specifier = ">=1.19.0" },
-    { name = "matplotlib", specifier = ">=3.11.0" },
     { name = "numpy", specifier = ">=2.4.6" },
     { name = "openai", specifier = ">=2.41.1" },
     { name = "pandas", specifier = ">=3.0.3" },
     { name = "pyarrow", specifier = ">=24.0.0" },
     { name = "python-dotenv", specifier = ">=1.2.2" },
-    { name = "python-pptx", specifier = ">=1.0.2" },
-    { name = "tqdm", specifier = ">=4.68.2" },
-    { name = "turbovec", specifier = ">=0.8.0" },
+    { name = "turbovec", marker = "extra == 'turbovec'", specifier = ">=0.8.0" },
     { name = "typing-extensions", specifier = ">=4.15.0" },
 ]
+provides-extras = ["turbovec"]
 
 [package.metadata.requires-dev]
 dev = [

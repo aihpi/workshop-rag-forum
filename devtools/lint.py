@@ -5,7 +5,13 @@ from rich import get_console, reconfigure
 from rich import print as rprint
 
 # Update as needed.
-SRC_PATHS = ["src", "tests", "devtools"]
+SRC_PATHS = [
+    "src",
+    "tests",
+    "devtools",
+    "01_event/260901-rag-bias/src",
+    "01_event/260901-rag-bias/tests",
+]
 DOC_PATHS = ["README.md"]
 
 

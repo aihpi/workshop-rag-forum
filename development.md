@@ -18,8 +18,9 @@ The `Makefile` simply offers shortcuts to `uv` commands for developer convenienc
 
 ```shell
 # First, install all dependencies and set up your virtual environment.
-# This simply runs `uv sync --all-extras` to install all packages,
-# including dev dependencies and optional dependencies.
+# This simply runs `uv sync --all-packages --all-extras` to install the shared
+# package and every meeting in the workspace (see ARCHITECTURE.md), including
+# dev dependencies and optional dependencies.
 make install
 
 # Run uv sync, lint, and test (and also generate agent rules):
