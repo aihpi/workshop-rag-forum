@@ -8,33 +8,35 @@ For setup see [installation.md](installation.md); for developer workflows see
 
 ## What the repository is
 
-Two things that are deliberately kept apart:
+One folder per meeting in `01_event/YYMMDD-topic/`, and nothing else. A meeting
+folder holds documentation, figures, driver scripts and, where a meeting needs
+code of its own, its packages. The root holds only what every meeting shares:
+tooling, `.env`, `data/` and this file.
 
-1. **A reusable RAG pipeline** in `src/workshop_rag_forum/`. Stable across
-   meetings. Every stage is swappable, which is the whole point: a meeting's
-   question is usually "what changes if I swap *this* stage?"
-2. **One folder per meeting** in `01_event/YYMMDD-topic/`. Meeting folders hold
-   documentation, figures, driver scripts and, where a meeting needs code of its
-   own, a package of their own. They may be dated; the shared package may not.
+Inside the 260901 folder two packages are deliberately kept apart:
 
-The rule of thumb: if a second meeting could use it, it belongs in the shared
-package; if only one meeting uses it, it lives in that meeting's folder. The
-dependency runs one way only: a meeting imports from `workshop_rag_forum`, never
-the reverse. The same rule applies to documentation. This file holds what is
-durable; meeting folders hold what is specific to one question.
+1. **A RAG pipeline**, `workshop_rag_forum`. Every stage is swappable, which is
+   the whole point: a meeting's question is usually "what changes if I swap
+   *this* stage?" It knows nothing about the study.
+2. **The study**, `rag_bias`. It imports the pipeline, never the reverse.
 
-The repository is a **uv workspace**. The root `pyproject.toml` is the shared
-package; every meeting with code is a workspace member with its own
-`pyproject.toml`, so its dependencies (turbovec, matplotlib, the Wikidata client)
-never leak into the shared package. One `uv.lock` and one `.venv` cover all of
-them: `uv sync --all-packages --all-extras`, which is what `make install` and CI
-run.
+The pipeline lives next to the study because the study is its only user. When a
+second meeting needs it, move it to a workspace member of its own at the root
+and point both meetings at it. The one line that depends on where it sits is
+`REPO_ROOT` in `config.py`, which counts folder levels up to the repository root
+for `.env` and `data/`.
+
+The repository is a **uv workspace**. The root `pyproject.toml` holds no package
+(`tool.uv.package = false`), only the member list, the dev tools and the
+ruff/basedpyright/pytest settings. Every meeting with code is a member with its
+own `pyproject.toml`, so its dependencies never leak into another meeting. One
+`uv.lock` and one `.venv` cover all of them: `uv sync --all-packages
+--all-extras`, which is what `make install` and CI run.
 
 | Member | Folder | Kind |
 |---|---|---|
-| `workshop-rag-forum` | repository root | the shared pipeline, `src/workshop_rag_forum/` |
 | `turbovec-demo` | `01_event/260615-turbovec/` | standalone scripts, not a package (`tool.uv.package = false`) |
-| `rag-bias` | `01_event/260901-rag-bias/` | package `rag_bias` in its `src/`, with tests and the `rag-bias` command |
+| `rag-bias` | `01_event/260901-rag-bias/` | packages `workshop_rag_forum` and `rag_bias` in its `src/`, with tests and the `rag-bias` command |
 
 A meeting without code, such as `261102-llm-wiki`, has no `pyproject.toml` and is
 not a member.
@@ -42,24 +44,21 @@ not a member.
 ## Top-level layout
 
 ```
-├── src/workshop_rag_forum/   the shared pipeline
-├── tests/                    pytest suite for the shared pipeline; no network
 ├── 01_event/                 one folder per meeting
 │   ├── 260615-turbovec/        vector compression vs. a float32 baseline; scripts + pyproject.toml
-│   ├── 260901-rag-bias/        retrieval bias; src/rag_bias/, tests/, pyproject.toml (see its METHOD.md and README.md)
+│   ├── 260901-rag-bias/        retrieval bias; src/workshop_rag_forum/, src/rag_bias/, tests/, pyproject.toml (see its METHOD.md and README.md)
 │   └── 261102-llm-wiki/        LLM wiki instead of RAG: slides and starter skills, no code
 ├── 00_aisc/img/              AISC and funder logos used in the READMEs
 ├── devtools/lint.py          codespell + ruff + basedpyright, invoked by `make lint` and CI
 ├── data/                     generated corpora, indexes, results (gitignored)
-├── .github/workflows/        ci.yml (lint + test) and buld_publish.yml
+├── .github/workflows/        ci.yml (lint + test)
 │
 ├── ARCHITECTURE.md           this file
 ├── README.md                 project overview, meeting index, quick start
 ├── installation.md           installing uv and Python
 ├── development.md            developer workflows and IDE setup
-├── publishing.md             release/publishing notes (from the template)
-├── Makefile                  install · lint · test · build · clean · upgrade
-├── pyproject.toml            shared package, workspace members, ruff/basedpyright/pytest config
+├── Makefile                  install · lint · test · clean · upgrade
+├── pyproject.toml            workspace members, dev tools, ruff/basedpyright/pytest config; no package
 ├── uv.lock                   resolved dependency lockfile for the whole workspace
 ├── .env_example              copy to .env; endpoint URL, key, model names
 ├── .gitignore                excludes data/, .env, build artefacts
@@ -67,9 +66,9 @@ not a member.
 └── LICENSE                   MIT
 ```
 
-## The shared package
+## The pipeline package
 
-`src/workshop_rag_forum/`:
+`01_event/260901-rag-bias/src/workshop_rag_forum/`:
 
 | Module | What it does |
 |---|---|
@@ -82,11 +81,11 @@ not a member.
 | `generation.py` | Builds a numbered-context prompt, calls the chat model, and parses the `[n]` citations back out, so it is recorded which passages the answer actually used. |
 | `pipeline.py` | `RagPipeline`: a retriever plus an optional generator. Generation is optional so retrieval-only studies need no chat model. |
 
-## A meeting package: rag_bias
+## The study package
 
-`01_event/260901-rag-bias/src/rag_bias/` is the worked example of a meeting with
-code of its own. It imports the pipeline above and adds what only the bias study
-needs; its method is documented in that meeting's METHOD.md.
+`01_event/260901-rag-bias/src/rag_bias/` imports the pipeline above and adds
+what only the bias study needs; its method is documented in that meeting's
+METHOD.md.
 
 | Module | What it does |
 |---|---|
@@ -259,20 +258,21 @@ packages, and a script only sequences it and renders figures.
 ## Tests
 
 74 tests, no network. External data is passed in as fixtures rather than
-fetched. `uv run pytest` runs both suites.
+fetched. All of them sit in `01_event/260901-rag-bias/tests/`; `uv run pytest`
+from the root runs them.
 
 | File | Covers |
 |---|---|
-| `tests/test_chunking.py` | no word is lost, overlap is exact, over-long windows split rather than truncate |
-| `tests/test_store.py` | row alignment, exact cosine ordering, parquet round trip with typed `attrs` |
-| `tests/test_retrieval.py` | dense and MMR retrieval, citation parsing, the pipeline with and without a generator |
-| `01_event/260901-rag-bias/tests/test_ratio.py` | the metric's arithmetic, scale-freeness, both refusal rules, relevant-set filtering |
-| `01_event/260901-rag-bias/tests/test_biographies.py` | corpus variants preserve or equalise the split, cannot invent people, person-level pooling |
-| `01_event/260901-rag-bias/tests/test_rerank.py` | DetGreedy's prefix guarantee, that it never invents or drops candidates, target normalisation |
-| `01_event/260901-rag-bias/tests/test_study.py` | person-deduplication, the trade-off sweep's endpoints, tercile restriction on both sides of the ratio, nDCG |
+| `test_chunking.py` | no word is lost, overlap is exact, over-long windows split rather than truncate |
+| `test_store.py` | row alignment, exact cosine ordering, parquet round trip with typed `attrs` |
+| `test_retrieval.py` | dense and MMR retrieval, citation parsing, the pipeline with and without a generator |
+| `test_ratio.py` | the metric's arithmetic, scale-freeness, both refusal rules, relevant-set filtering |
+| `test_biographies.py` | corpus variants preserve or equalise the split, cannot invent people, person-level pooling |
+| `test_rerank.py` | DetGreedy's prefix guarantee, that it never invents or drops candidates, target normalisation |
+| `test_study.py` | person-deduplication, the trade-off sweep's endpoints, tercile restriction on both sides of the ratio, nDCG |
 
-Test file names must stay unique across both folders, because pytest imports
-them by basename.
+Test file names must stay unique across meetings, because pytest imports them
+by basename.
 
 `test_ratio.py` is the important one: every case pins a property whose correct
 answer is known by construction, because that file carries the study's claims.
@@ -311,8 +311,9 @@ another.
 nothing else. A meeting with scripts adds a `pyproject.toml` with its own
 dependencies and `tool.uv.package = false` (see `260615-turbovec`). A meeting
 with importable code adds a package under its own `src/`, tests, and a
-`pyproject.toml` that depends on `workshop-rag-forum` as a workspace source (see
-`260901-rag-bias`); add its `src` and `tests` to `testpaths` and
-`[tool.basedpyright]` in the root `pyproject.toml` and to `SRC_PATHS` in
-`devtools/lint.py`. Either way, list the folder under `[tool.uv.workspace]
-members`. If a second meeting could use the code, it belongs in `src/` instead.
+`pyproject.toml` with a hatchling build (see `260901-rag-bias`); add its `src`
+and `tests` to `testpaths` and `[tool.basedpyright]` in the root
+`pyproject.toml` and to `SRC_PATHS` in `devtools/lint.py`. Either way, list the
+folder under `[tool.uv.workspace] members` and its `src` under `[tool.ruff]
+src`. To reuse `workshop_rag_forum`, move it out into a member of its own rather
+than depending on `rag-bias`, which would drag the study's dependencies along.

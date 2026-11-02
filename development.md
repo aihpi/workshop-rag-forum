@@ -18,16 +18,12 @@ The `Makefile` simply offers shortcuts to `uv` commands for developer convenienc
 
 ```shell
 # First, install all dependencies and set up your virtual environment.
-# This simply runs `uv sync --all-packages --all-extras` to install the shared
-# package and every meeting in the workspace (see ARCHITECTURE.md), including
-# dev dependencies and optional dependencies.
+# This simply runs `uv sync --all-packages --all-extras` to install the dev
+# tools and every meeting in the workspace (see ARCHITECTURE.md).
 make install
 
 # Run uv sync, lint, and test (and also generate agent rules):
 make
-
-# Build wheel:
-make build
 
 # Linting:
 make lint
@@ -43,11 +39,7 @@ make upgrade
 
 # To run tests by hand:
 uv run pytest   # all tests
-uv run pytest -s src/module/some_file.py  # one test, showing outputs
-
-# Build and install current dev executables, to let you use your dev copies
-# as local tools:
-uv tool install --editable .
+uv run pytest -s 01_event/260901-rag-bias/tests/test_store.py  # one file, showing outputs
 
 # Dependency management directly with uv:
 # Add a new dependency:

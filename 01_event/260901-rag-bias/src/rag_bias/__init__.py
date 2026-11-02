@@ -1,4 +1,4 @@
-"""The 260901 retrieval bias study, built on the shared `workshop_rag_forum` pipeline.
+"""The 260901 retrieval bias study, built on the `workshop_rag_forum` pipeline next to it.
 
 * `biographies` the corpus: German Wikipedia biographies labelled from Wikidata
 * `bias`        the metric A = p_k/p0, nDCG, the length covariate and the runner

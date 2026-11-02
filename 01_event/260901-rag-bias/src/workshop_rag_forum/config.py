@@ -14,7 +14,9 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+# <repo>/01_event/260901-rag-bias/src/workshop_rag_forum/config.py: .env and
+# data/ live at the repository root, shared by every meeting.
+REPO_ROOT = Path(__file__).resolve().parents[4]
 
 
 class ConfigError(RuntimeError):

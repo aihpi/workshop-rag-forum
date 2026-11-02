@@ -4,7 +4,7 @@
 
 .DEFAULT_GOAL := default
 
-.PHONY: default install lint test upgrade build clean
+.PHONY: default install lint test upgrade clean
 
 default: install lint test 
 
@@ -19,9 +19,6 @@ test:
 
 upgrade:
 	uv sync --upgrade --all-packages --all-extras --dev
-
-build:
-	uv build
 
 clean:
 	-rm -rf dist/

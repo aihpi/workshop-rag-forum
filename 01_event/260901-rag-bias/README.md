@@ -8,17 +8,27 @@ Code for the empirical part of the session: it produces the numbers behind
   additions, and the reasoning behind all of it.
 - **This file**: how to run it, what comes out, and what not to trust.
 
-The study is its own package, `rag_bias`, built on the shared pipeline in
-`src/workshop_rag_forum/`:
+The meeting ships two packages: `workshop_rag_forum`, a small, complete RAG
+pipeline in which every stage sits behind a `Protocol`, and `rag_bias`, the study
+on top of it. The pipeline is written so that another meeting could lift it out:
+
+| Stage | Implementations |
+|-------|-----------------|
+| Embedding | `OpenAIEmbedder` (any OpenAI-compatible endpoint, incl. a LiteLLM proxy), `HashEmbedder` (deterministic, offline) |
+| Store | `VectorStore`, with text, labels and vectors persisted **together**, exact cosine search |
+| Retrieval | `DenseRetriever`, `MMRRetriever` (relevance diversification), `TurboVecRetriever` (quantised search with turbovec, the 260615 topic) |
+| Generation | `OpenAIGenerator` (citation-grounded prompting), `EchoGenerator` (offline stub) |
 
 ```
-pyproject.toml        workspace member "rag-bias"; installs the `rag-bias` command
+pyproject.toml        workspace member "rag-bias"; installs both packages and the `rag-bias` command
+src/workshop_rag_forum/
+  types, config, chunking, embedding, store, retrieval, generation, pipeline
 src/rag_bias/
   biographies.py      the corpus: Wikidata-labelled dewiki biographies, R and K variants
   bias/               ratio.py (A = p_k/p0), quality.py (nDCG), covariate.py, study.py
   rerank.py           DetGreedy, the fairness-aware reranker of the trade-off sweep
   cli.py              build-corpus, query, study, show
-tests/                the study's tests, run with the rest by `uv run pytest`
+tests/                tests for both packages, no network; `uv run pytest` from the repo root
 01_…03_*.py           thin drivers: both variants in one go, then the figures
 ```
 

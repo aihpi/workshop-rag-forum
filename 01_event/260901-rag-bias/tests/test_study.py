@@ -1,9 +1,9 @@
 """The study runner, the length covariate and the nDCG trade-off."""
 
 import pytest
+
 from rag_bias.bias import covariate, quality, study
 from rag_bias.biographies import Occupation
-
 from workshop_rag_forum.embedding import HashEmbedder
 from workshop_rag_forum.retrieval import DenseRetriever
 from workshop_rag_forum.store import VectorStore

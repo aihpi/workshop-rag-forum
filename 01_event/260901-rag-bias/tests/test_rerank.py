@@ -1,8 +1,8 @@
 """DetGreedy, the fairness-aware reranker behind the study's trade-off sweep."""
 
 import pytest
-from rag_bias.rerank import DetGreedyRetriever, rerank_detgreedy
 
+from rag_bias.rerank import DetGreedyRetriever, rerank_detgreedy
 from workshop_rag_forum.embedding import HashEmbedder
 from workshop_rag_forum.store import VectorStore
 from workshop_rag_forum.types import Chunk, RetrievedChunk

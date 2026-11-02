@@ -1,4 +1,4 @@
-# The 260615 scripts are standalone and import nothing from the shared package;
+# The 260615 scripts are standalone and import nothing from another meeting;
 # this file only declares what they need.
 
 [project]

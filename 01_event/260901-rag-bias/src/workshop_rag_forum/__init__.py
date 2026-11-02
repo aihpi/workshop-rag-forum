@@ -1,4 +1,4 @@
-"""The RAG pipeline shared by the forum's meetings.
+"""A small, complete RAG pipeline with swappable stages.
 
 Typical use:
 
@@ -12,9 +12,9 @@ Typical use:
     pipeline = RagPipeline(DenseRetriever(store, embedder), top_k=5)
     print(pipeline.retrieve("Who led the migration?"))
 
-Code that only one meeting needs lives in that meeting's folder and imports
-from here, never the other way round. The bias study, for example, is the
-`rag_bias` package in `01_event/260901-rag-bias/`.
+This package knows nothing about any study. `rag_bias` next to it imports from
+here, never the other way round, so the pipeline can be lifted out for another
+meeting as it is.
 """
 
 from .chunking import chunk_document, chunk_documents, split_words

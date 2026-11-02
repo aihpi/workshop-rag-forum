@@ -1,8 +1,8 @@
 """Fairness-aware reranking for the bias study.
 
 DetGreedy lives here rather than in `workshop_rag_forum.retrieval` because it
-reranks by a group label the study puts into `attrs`; the shared pipeline has no
-notion of groups.
+reranks by a group label the study puts into `attrs`; the pipeline has no notion
+of groups.
 """
 
 from __future__ import annotations

@@ -1997,8 +1997,12 @@ dependencies = [
     { name = "httpx" },
     { name = "matplotlib" },
     { name = "numpy" },
+    { name = "openai" },
+    { name = "pandas" },
+    { name = "pyarrow" },
+    { name = "python-dotenv" },
+    { name = "turbovec" },
     { name = "typing-extensions" },
-    { name = "workshop-rag-forum", extra = ["turbovec"] },
 ]
 
 [package.metadata]
@@ -2006,8 +2010,12 @@ requires-dist = [
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "matplotlib", specifier = ">=3.11.0" },
     { name = "numpy", specifier = ">=2.4.6" },
+    { name = "openai", specifier = ">=2.41.1" },
+    { name = "pandas", specifier = ">=3.0.3" },
+    { name = "pyarrow", specifier = ">=24.0.0" },
+    { name = "python-dotenv", specifier = ">=1.2.2" },
+    { name = "turbovec", specifier = ">=0.8.0" },
     { name = "typing-extensions", specifier = ">=4.15.0" },
-    { name = "workshop-rag-forum", extras = ["turbovec"], editable = "." },
 ]
 
 [[package]]
@@ -2217,20 +2225,8 @@ wheels = [
 
 [[package]]
 name = "workshop-rag-forum"
-source = { editable = "." }
-dependencies = [
-    { name = "numpy" },
-    { name = "openai" },
-    { name = "pandas" },
-    { name = "pyarrow" },
-    { name = "python-dotenv" },
-    { name = "typing-extensions" },
-]
-
-[package.optional-dependencies]
-turbovec = [
-    { name = "turbovec" },
-]
+version = "0.0.0"
+source = { virtual = "." }
 
 [package.dev-dependencies]
 dev = [
@@ -2244,16 +2240,6 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [
-    { name = "numpy", specifier = ">=2.4.6" },
-    { name = "openai", specifier = ">=2.41.1" },
-    { name = "pandas", specifier = ">=3.0.3" },
-    { name = "pyarrow", specifier = ">=24.0.0" },
-    { name = "python-dotenv", specifier = ">=1.2.2" },
-    { name = "turbovec", marker = "extra == 'turbovec'", specifier = ">=0.8.0" },
-    { name = "typing-extensions", specifier = ">=4.15.0" },
-]
-provides-extras = ["turbovec"]
 
 [package.metadata.requires-dev]
 dev = [

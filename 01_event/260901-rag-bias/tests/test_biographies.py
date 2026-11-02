@@ -1,9 +1,9 @@
 """Corpus construction. No network: populations are passed in directly."""
 
 import pytest
+
 from rag_bias import biographies as bio
 from rag_bias.bias.study import pool_groups
-
 from workshop_rag_forum.chunking import chunk_documents
 from workshop_rag_forum.embedding import HashEmbedder
 from workshop_rag_forum.store import VectorStore

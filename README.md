@@ -21,60 +21,21 @@ Each meeting we pick one, dig in together, and compare problems, stacks, and ide
 ## Repository layout
 
 ```
-src/workshop_rag_forum/   # the shared RAG pipeline, used by every meeting
-  chunking, embedding, store, retrieval, generation, pipeline
-tests/                    # pytest suite for src/
 01_event/                 # one folder per meeting: YYMMDD-topic/
   260615-turbovec/        # vector compression; standalone scripts + pyproject.toml
-  260901-rag-bias/        # retrieval bias; own package, tests + pyproject.toml
-    src/rag_bias/         # biographies corpus, bias/ metrics, DetGreedy, `rag-bias` CLI
+  260901-rag-bias/        # retrieval bias; packages, tests + pyproject.toml
+    src/workshop_rag_forum/   # a small RAG pipeline: chunking, embedding, store, retrieval, generation
+    src/rag_bias/             # the study on top of it: corpus, metrics, DetGreedy, `rag-bias` CLI
   261102-llm-wiki/        # LLM wiki instead of RAG, with starter skills; no code
 devtools/                 # lint script behind `make lint` and CI
 data/                     # corpora, indexes & results (gitignored)
 .env_example              # copy to .env and fill in your endpoint + key
 ```
 
-## The RAG pipeline
-
-`src/workshop_rag_forum/` is a small, complete RAG system rather than a demo
-script. Every stage sits behind a `Protocol`, which is what lets the meetings
-compare stages against each other:
-
-| Stage | Implementations |
-|-------|-----------------|
-| Embedding | `OpenAIEmbedder` (any OpenAI-compatible endpoint, incl. a LiteLLM proxy), `HashEmbedder` (deterministic, offline) |
-| Store | `VectorStore`, with text, labels and vectors persisted **together**, exact cosine search |
-| Retrieval | `DenseRetriever`, `MMRRetriever` (relevance diversification), `TurboVecRetriever` (quantised, reusing the 260615 index) |
-| Generation | `OpenAIGenerator` (citation-grounded prompting), `EchoGenerator` (offline stub) |
-
 The repository is a [uv workspace](https://docs.astral.sh/uv/concepts/projects/workspaces/):
-the root project is the shared pipeline, and every meeting with code is a
-member with its own `pyproject.toml` and dependencies. Code that only one
-meeting needs lives in that meeting's folder and imports from the pipeline,
-never the other way round. `make install` (`uv sync --all-packages --all-extras`)
+the root holds no code, and every meeting with code is a member with its own
+`pyproject.toml` and dependencies. `make install` (`uv sync --all-packages --all-extras`)
 installs everything into one `.venv`.
-
-## Measuring retrieval bias
-
-The 260901 meeting measures **A = p_k / p₀**, a group's share of the top-k
-divided by its base rate in the relevant set, on German Wikipedia biographies
-labelled from Wikidata. A ratio rather than a share gap, so it is scale-free in
-the base rate. The same run also reports nDCG, A inside article-length terciles,
-and what fairness-aware reranking costs in ranking quality.
-
-```bash
-cp .env_example .env      # OPENAI_API_BASE / _API_KEY / _EMBEDDING_MODEL
-
-uv sync --all-packages    # installs the pipeline and the rag-bias package
-
-uv run rag-bias build-corpus --variant R    # realistic gender split
-uv run rag-bias build-corpus --variant K    # downsampled to 50/50
-uv run rag-bias study --variant R --ks 10,100
-uv run rag-bias show --variant R
-```
-
-Add `--offline` to exercise the pipeline with hash embeddings and no endpoint:
-useful for checking the plumbing, never for a reported number.
 
 ## Meetings
 
@@ -88,8 +49,7 @@ useful for checking the plumbing, never for a reported number.
 
 - [ARCHITECTURE.md](ARCHITECTURE.md): how the repository and the pipeline are
   organised. Module map, the `attrs` contract, the Protocol seams, on-disk layout.
-- [01_event/260901-rag-bias/METHOD.md](01_event/260901-rag-bias/METHOD.md):
-  the bias study's method. Data sources, corpus variants, and the metric.
+- Each meeting folder has its own README with how to run it and what comes out.
 
 ## Setup
 

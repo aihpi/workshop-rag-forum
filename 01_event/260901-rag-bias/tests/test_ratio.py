@@ -2,8 +2,8 @@
 against a case whose correct answer is known by construction."""
 
 import pytest
-from rag_bias.bias import ratio
 
+from rag_bias.bias import ratio
 from workshop_rag_forum.types import Chunk, RetrievedChunk
 
 GROUPS = ["female", "male", "other"]
